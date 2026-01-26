@@ -1,58 +1,100 @@
 services:
+
+# Springboot service (backend)
   backend:
+    # Build from Dockerfile in the "backend" folder
     build: backend
+    # If container stops, it will restart with this policy
     restart: always
+    # Reads from the secret declaration at the end of this file and store in /run/secrets/db-password
     secrets:
       - db-password
+    # Sets environment variables inside the container
     environment:
       MYSQL_HOST: db
+    # Sets the different networks it will be part of
     networks:
       - react-spring
       - spring-mysql
+    # It will wait for db service to be healthy before starting
     depends_on:
       db:
         condition: service_healthy
+
+# MySQL service (database)
   db:
-    # We use a mariadb image which supports both amd64 & arm64 architecture
-    #image: mariadb:10.6.4-focal
-    # If you really want to use MySQL, uncomment the following line
+    # Starts from the mysql:8.0.19 image
     image: mysql:8.0.19
+    # Sets environment variables inside the container
     environment:
       - MYSQL_DATABASE=example
       - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/db-password
+    # If container stops, it will restart with this policy
     restart: always
+    # Checks if MySQL is ready to accept connections
+    # Docker will run the test command 5 times every 3 seconds, starting from 30 seconds after starting
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "--silent"]
       interval: 3s
       retries: 5
       start_period: 30s
+    # Reads from the secret declaration at the end of this file and store in /run/secrets/db-password
     secrets:
       - db-password
     volumes:
+    # Sets the db-data volume to the /var/lib/mysql folder in the container
       - db-data:/var/lib/mysql
+    # Sets the network to be in the backend <-> mysql net
     networks:
       - spring-mysql
+
+  # React service (frontend)
   frontend:
+    # Build from the frontend folder Dockerfile
     build:
       context: frontend
+      # From that Dockerfile, get the "development" "image" (FROM X as development)
       target: development
-    ports:
-      - 3000:3000
+    # Sets a volume to sync the /frontend/src files to the /code/src files in the container
     volumes:
       - ./frontend/src:/code/src
-      - /project/node_modules
+      # Makes a "not sync" volume to keep dependencies in the container separated (not needed but useful)
+      - /code/node_modules
+    # Sets the networks to the proxy <-> frontend and frontend <-> backend networks
     networks:
+      - proxy-react
       - react-spring
+    # Depends on backend to be up (which requires DB to be up)
     depends_on:
       - backend
-    expose:
-      - 3306
-      - 33060
+
+# Nginx service (Proxy)
+  proxy:
+    # Build the Dockerfile from the nginx folder
+    build: nginx
+    # Binds localhost port 80 to the port 80 of the container
+    ports:
+      - 80:80
+    # Sets the network to the one that connects frontend to proxy
+    networks:
+      - proxy-react
+    # Depends on frontend to be up (which requires backend to be up)
+    depends_on:
+      - frontend
+
+# Create a serie of volumes
 volumes:
+  # Create a volume called db-data with default settings ({})
   db-data: {}
+  
+# Defines the secrets for using it in services
 secrets:
+  # Creates the db-password secret from the file "db/password.txt" file. It also can be a "environment", "external" and "content"
   db-password:
     file: db/password.txt
+
+# Create a series of networks with default settings
 networks:
   react-spring: {}
   spring-mysql: {}
+  proxy-react: {}
