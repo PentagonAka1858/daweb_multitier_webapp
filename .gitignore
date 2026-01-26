@@ -1,6 +1,3 @@
-# DB cred
-db/password.txt
-
 # dependencies
 /node_modules
 /.pnp
