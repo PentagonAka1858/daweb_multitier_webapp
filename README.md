@@ -205,8 +205,11 @@ It is recommended to start Komodo first, followed by the application stack.
 #### 1. Komodo stack
 
 ```shell
-docker compose -f komodo/compose.yaml up -d
+docker compose -p komodo -f komodo/mongo.compose.yaml --env-file komodo/compose.env up -d
 ```
+
+> [!TIP]
+> The *-p* flag let us specify the project name, the *-f* flag tells wich compose file to use, the *--env-file* flag tells docker wich environment file to use.
 
 Komodo UI will be available at:
 
@@ -312,6 +315,12 @@ docker compose logs -f backend
 docker compose logs -f db
 docker compose logs -f frontend
 docker compose logs -f proxy
+```
+
+View stats:
+
+```bash
+docker stats
 ```
 
 > [!TIP]
