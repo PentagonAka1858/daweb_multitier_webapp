@@ -6,6 +6,9 @@ services:
     build: backend
     # If container stops, it will restart with this policy
     restart: always
+    # Labels for the Komodo UI
+    labels:
+      komodo.stack: react-spring-app
     # Reads from the secret declaration at the end of this file and store in /run/secrets/db-password
     secrets:
       - db-password
@@ -31,6 +34,9 @@ services:
       - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/db-password
     # If container stops, it will restart with this policy
     restart: always
+    # Labels for the Komodo UI
+    labels:
+      komodo.stack: react-spring-app
     # Checks if MySQL is ready to accept connections
     # Docker will run the test command 5 times every 3 seconds, starting from 30 seconds after starting
     healthcheck:
@@ -55,6 +61,11 @@ services:
       context: frontend
       # From that Dockerfile, get the "development" "image" (FROM X as development)
       target: development
+    # If container stops, it will restart with this policy
+    restart: always
+    # Labels for the Komodo UI
+    labels:
+      komodo.stack: react-spring-app
     # Sets a volume to sync the /frontend/src files to the /code/src files in the container
     volumes:
       - ./frontend/src:/code/src
@@ -72,6 +83,11 @@ services:
   proxy:
     # Build the Dockerfile from the nginx folder
     build: nginx
+    # If container stops, it will restart with this policy
+    restart: always
+    # Labels for the Komodo UI
+    labels:
+      komodo.stack: react-spring-app
     # Binds localhost port 80 to the port 80 of the container
     ports:
       - 80:80
