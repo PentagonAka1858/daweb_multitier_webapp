@@ -36,6 +36,9 @@
 - [External documentation and screenshots](#external-documentation-and-screenshots)
   - [External documentation](#external-documentation)
   - [Screenshots](#screenshots)
+    - [Building](#building)
+    - [Tests](#tests)
+    - [Accessing](#accessing)
 - [Credits](#credits)
 
 ---
@@ -53,7 +56,7 @@
 │   └── ...
 ├── db
 │   └── password.txt
-├── docs
+├── doc
 │   ├── images
 │   │       ├── screenshot.png
 │   │       └── ...
@@ -355,6 +358,13 @@ docker stats
    - Disable unnecessary features (terminals, webhooks)
    - Optionally place Komodo behind VPN or reverse proxy
 
+Also, the next improvements could help in the security aspect:
+
+ - Use non-root MySQL user
+ - Enable HTTPS in nginx
+ - Add Spring Boot security (JWT or OAuth2)
+ - Use `.env` for environment-specific configs
+
 ## Manteinance and scalability recommendations
 
 ### Maintenance
@@ -399,11 +409,48 @@ docker stats
 
 ## External documentation
 
-
+ - [Backend doc](doc/backend.md)
+ - [Frontend doc](doc/frontend.md)
 
 ## Screenshots
 
+### Building
 
+Building the containers with `docker build`:
+
+![Building container](./doc/img/building.png "docker build")
+
+Visualizing the containers with `docker ps`:
+
+![Builded container](./doc/img/containers.png "docker ps")
+
+### Tests
+
+Logs from the proxy using `docker compose logs <service>`:
+
+![nginx logs](./doc/img/logsProxy.png "docker compose logs")
+
+Stats from the `docker stats` command:
+
+![Docker stats](./doc/img/stats.png "docker stats")
+
+Komodo dashboard showing server stats and containers up:
+
+![Komodo Dashboard](./doc/img/KomodoDashboard.png "Komodo UI")
+
+Komodo interface that shows information about containers, like network, image, server, etc:
+
+![Komodo Containers](./doc/img/KomodoContainers.png "Komodo containers UI")
+
+### Accessing
+
+Accessing the Frontend app from the proxy:
+
+![Frontend access](./doc/img/Frontend.png "frontend from proxy")
+
+Accessing the Backend app from the Frontend (which is accessed from proxy):
+
+![Backend access](./doc/img/Backend.png "backend from frontend")
 
 # Credits
 
